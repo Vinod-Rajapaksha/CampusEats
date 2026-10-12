@@ -10,7 +10,7 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 var jwt = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwt["Key"];
+var jwtKey = jwt["Key"] ?? "dev-only-secret-change-me-min-32-characters!!";
 var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services
@@ -57,7 +57,8 @@ builder.Services.AddSwaggerGen(c =>
         });
 });
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins");
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:5173", "https://campuseats-web.vercel.app" };
 
 builder.Services.AddCors(options =>
 {
